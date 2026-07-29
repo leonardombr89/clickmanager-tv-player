@@ -1,0 +1,30 @@
+:host,
+.playback-stage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.playback-stage {
+  position: relative;
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #000;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.empty-frame {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}

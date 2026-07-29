@@ -1,0 +1,122 @@
+<main
+  class="player-shell"
+  [class.started]="interactionStarted()"
+  [class]="orientationClass()"
+>
+  @if (player.configuration()?.itens?.length) {
+    <app-playback
+      [items]="player.configuration()!.itens"
+      (mediaChange)="player.setCurrentMedia($event)"
+    />
+
+    @if (!interactionStarted()) {
+      <div class="interaction-layer">
+        <button class="primary-action" type="button" (click)="startExperience()">
+          <span class="play-icon" aria-hidden="true">▶</span>
+          Iniciar reprodução
+        </button>
+        <p>Toque uma vez para ativar tela cheia.</p>
+      </div>
+    }
+  } @else {
+    <section class="status-screen">
+      <div class="brand" aria-label="ClickTV">
+        <span class="brand-mark">C</span>
+        <span>Click<strong>TV</strong></span>
+      </div>
+
+      @switch (player.state()) {
+        @case ('INICIANDO') {
+          <div class="status-card compact">
+            <span class="spinner" aria-hidden="true"></span>
+            <h1>Iniciando sua tela</h1>
+            <p>Estamos preparando uma experiência incrível.</p>
+          </div>
+        }
+        @case ('AGUARDANDO_ATIVACAO') {
+          <div class="status-card activation-card">
+            <span class="eyebrow">Código de ativação</span>
+            <output class="activation-code">{{ activationCode() }}</output>
+            <h1>Vincule esta tela</h1>
+            <p>
+              No ClickManager, acesse <strong>ClickTV → Telas</strong> e informe
+              o código acima.
+            </p>
+            <div class="waiting-line">
+              <span class="pulse" aria-hidden="true"></span>
+              Aguardando vinculação
+            </div>
+          </div>
+        }
+        @case ('ATIVACAO_EXPIRADA') {
+          <div class="status-card">
+            <span class="state-icon">⌛</span>
+            <h1>O código expirou</h1>
+            <p>Gere um novo código para continuar a vinculação.</p>
+            <button class="primary-action" type="button" (click)="player.createActivation()">
+              Gerar novo código
+            </button>
+          </div>
+        }
+        @case ('SINCRONIZANDO') {
+          <div class="status-card compact">
+            <span class="spinner" aria-hidden="true"></span>
+            <h1>Sincronizando conteúdo</h1>
+            <p>Sua programação começa em instantes.</p>
+          </div>
+        }
+        @case ('SEM_CONTEUDO') {
+          <div class="status-card">
+            <span class="state-icon">▣</span>
+            <h1>Tela pronta</h1>
+            <p>Associe uma playlist padrão no ClickManager para começar.</p>
+          </div>
+        }
+        @case ('CONEXAO_INDISPONIVEL') {
+          <div class="status-card">
+            <span class="state-icon">↻</span>
+            <h1>Sem conexão</h1>
+            <p>Verifique a internet. Tentaremos novamente em seguida.</p>
+            <button class="secondary-action" type="button" (click)="player.retry()">
+              Tentar agora
+            </button>
+          </div>
+        }
+        @case ('DISPOSITIVO_INVALIDO') {
+          <div class="status-card">
+            <span class="state-icon">○</span>
+            <h1>Dispositivo desvinculado</h1>
+            <p>Preparando um novo código de ativação.</p>
+          </div>
+        }
+        @default {
+          <div class="status-card">
+            <span class="state-icon">!</span>
+            <h1>Não foi possível iniciar</h1>
+            <p>Tente novamente. Se o problema continuar, fale com o suporte.</p>
+            <button class="secondary-action" type="button" (click)="player.retry()">
+              Tentar novamente
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+
+  @if (player.connectionUnavailable()) {
+    <div class="offline-badge" role="status">
+      <span></span>
+      Reconectando
+    </div>
+  }
+
+  <button
+    class="reset-device"
+    type="button"
+    aria-label="Redefinir dispositivo"
+    title="Redefinir dispositivo"
+    (click)="resetDevice()"
+  >
+    <span aria-hidden="true">↻</span>
+  </button>
+</main>

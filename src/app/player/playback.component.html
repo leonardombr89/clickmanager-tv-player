@@ -1,0 +1,30 @@
+<section class="playback-stage" aria-live="off">
+  @if (currentItem; as item) {
+    @if (item.midia.tipo === 'IMAGEM') {
+      <img
+        class="media"
+        [src]="mediaUrl"
+        [alt]="item.midia.nome"
+        draggable="false"
+        (load)="onImageLoaded()"
+        (error)="onMediaError()"
+      >
+    } @else {
+      <video
+        #video
+        class="media"
+        [src]="mediaUrl"
+        [attr.aria-label]="item.midia.nome"
+        autoplay
+        muted
+        playsinline
+        preload="auto"
+        (loadedmetadata)="onVideoReady(video)"
+        (ended)="onVideoEnded()"
+        (error)="onMediaError()"
+      ></video>
+    }
+  } @else {
+    <div class="empty-frame"></div>
+  }
+</section>
