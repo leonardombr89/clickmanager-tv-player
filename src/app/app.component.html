@@ -1,8 +1,11 @@
+@if (downloadPage) {
+  <app-download-page />
+} @else {
 <main
-  class="player-shell"
-  [class.started]="interactionStarted()"
-  [class]="orientationClass()"
->
+    class="player-shell"
+    [class.started]="interactionStarted()"
+    [class]="orientationClass()"
+  >
   @if (player.configuration()?.itens?.length) {
     <app-playback
       [items]="player.configuration()!.itens"
@@ -51,6 +54,9 @@
               <span class="pulse" aria-hidden="true"></span>
               Aguardando vinculação
             </div>
+            <a class="download-link" href="/download">
+              Baixar aplicativo para Android TV
+            </a>
           </div>
         }
         @case ('ATIVACAO_EXPIRADA') {
@@ -127,3 +133,4 @@
     </button>
   }
 </main>
+}

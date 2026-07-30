@@ -52,6 +52,22 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("CLICKTV_KEYSTORE_PATH")
+            val keystorePassword = System.getenv("CLICKTV_KEYSTORE_PASSWORD")
+            val keyAliasValue = System.getenv("CLICKTV_KEY_ALIAS")
+            val keyPasswordValue = System.getenv("CLICKTV_KEY_PASSWORD")
+
+            if (!keystorePath.isNullOrBlank()) {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                keyAlias = keyAliasValue
+                keyPassword = keyPasswordValue
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -60,6 +76,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

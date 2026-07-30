@@ -142,6 +142,23 @@ p strong {
   background: #e0e7ff;
 }
 
+.download-link {
+  display: block;
+  width: fit-content;
+  margin: 24px auto 0;
+  color: #4338ca;
+  font-size: clamp(14px, 1.25vw, 18px);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.download-link:focus-visible {
+  outline: 4px solid #818cf8;
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
 .pulse {
   width: 10px;
   height: 10px;

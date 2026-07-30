@@ -9,16 +9,18 @@ import {
 } from '@angular/core';
 import { PlayerFacadeService } from './core/player-facade.service';
 import { WakeLockService } from './core/wake-lock.service';
+import { DownloadPageComponent } from './download/download-page.component';
 import { PlaybackComponent } from './player/playback.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [PlaybackComponent],
+  imports: [DownloadPageComponent, PlaybackComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
+  readonly downloadPage = window.location.pathname.replace(/\/+$/, '') === '/download';
   readonly interactionStarted = signal(false);
   readonly activationCode = computed(() => {
     const code = this.player.activation()?.codigo ?? '';
@@ -40,11 +42,15 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.player.start();
+    if (!this.downloadPage) {
+      this.player.start();
+    }
   }
 
   ngOnDestroy(): void {
-    this.player.shutdown();
+    if (!this.downloadPage) {
+      this.player.shutdown();
+    }
     void this.wakeLock.release();
   }
 

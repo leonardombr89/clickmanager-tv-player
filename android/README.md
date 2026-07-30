@@ -60,6 +60,13 @@ APK gerado:
 app/build/outputs/apk/development/debug/app-development-debug.apk
 ```
 
+O APK oficial de produção é gerado e assinado pelo GitHub Actions. Após o
+deploy, ele fica disponível em:
+
+```text
+https://tv.clickmanager.com.br/downloads/clicktv-player.apk
+```
+
 ## Instalação no BTV B13
 
 Copie o APK para um pendrive ou cartão SD, abra o gerenciador de arquivos do
