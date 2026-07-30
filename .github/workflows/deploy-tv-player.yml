@@ -1,0 +1,52 @@
+name: Deploy ClickManager TV Player (Lightsail)
+
+on:
+  workflow_run:
+    workflows: ["Build and publish ClickManager TV Player Docker image"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' ||
+          github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH to Lightsail
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/clickmanager
+
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "docker-compose.prod.yml nao encontrado em /opt/clickmanager"
+              exit 1
+            fi
+
+            if ! grep -qE '^[[:space:]]{2}tv-player:' docker-compose.prod.yml; then
+              echo "Servico 'tv-player' nao encontrado em docker-compose.prod.yml"
+              exit 1
+            fi
+
+            if command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE="docker-compose"
+            elif docker compose version >/dev/null 2>&1; then
+              COMPOSE="docker compose"
+            else
+              echo "Nem docker-compose nem docker compose estao disponiveis no servidor"
+              exit 1
+            fi
+
+            $COMPOSE -f docker-compose.prod.yml pull tv-player
+            $COMPOSE -f docker-compose.prod.yml up -d --no-deps tv-player
+            $COMPOSE -f docker-compose.prod.yml ps tv-player
