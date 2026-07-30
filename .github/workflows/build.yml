@@ -1,23 +1,42 @@
-name: Validate ClickManager TV Player
+name: Build and publish ClickManager TV Player Docker image
 
 on:
   push:
     branches:
       - main
     paths:
+      - ".github/workflows/**"
       - "src/**"
+      - "tools/**"
+      - "android/**"
+      - "docker-entrypoint.d/**"
       - "angular.json"
       - "package.json"
       - "package-lock.json"
       - "Dockerfile"
       - "nginx.conf"
+      - ".dockerignore"
   pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "src/**"
+      - "tools/**"
+      - "android/**"
+      - "docker-entrypoint.d/**"
+      - "angular.json"
+      - "package.json"
+      - "package-lock.json"
+      - "Dockerfile"
+      - "nginx.conf"
+      - ".dockerignore"
+  workflow_dispatch:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
-  validate:
+  web-and-docker:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,8 +52,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Test
+      - name: Test Angular player
         run: npm test
+
+      - name: Test legacy player
+        run: npm run test:legacy
 
       - name: Lint
         run: npm run lint
@@ -42,5 +64,55 @@ jobs:
       - name: Build production bundle
         run: npm run build:prod
 
-      - name: Validate Docker image
-        run: docker build -t clickmanager-tv-player:ci .
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:latest
+            ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:${{ github.sha }}
+
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test Android player
+        run: ./gradlew testDevelopmentDebugUnitTest
+
+      - name: Lint Android player
+        run: ./gradlew lintDevelopmentDebug
+
+      - name: Build development APK
+        run: ./gradlew assembleDevelopmentDebug
+
+      - name: Publish development APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clickmanager-tv-player-development-${{ github.sha }}
+          path: android/app/build/outputs/apk/development/debug/app-development-debug.apk
+          if-no-files-found: error
+          retention-days: 30

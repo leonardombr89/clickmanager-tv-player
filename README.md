@@ -73,3 +73,25 @@ O contêiner Android TV em Kotlin e Jetpack Compose está em
 [`android/`](android/README.md). Ele carrega este mesmo player Angular em uma
 WebView, mantendo a URL configurável no aparelho para testes locais,
 homologação e produção.
+
+## CI/CD
+
+O GitHub Actions valida o player web e Android a cada pull request. Ao publicar
+na branch `main`, o pipeline:
+
+1. executa testes, lint e build de produção do Angular;
+2. valida o player legado;
+3. executa testes e lint do Android;
+4. gera o APK de desenvolvimento como artefato;
+5. publica a imagem Docker no GHCR com as tags `latest` e SHA;
+6. após sucesso, atualiza somente o serviço `tv-player` na VPS.
+
+Imagem oficial:
+
+```text
+ghcr.io/leonardombr89/clickmanager-tv-player:latest
+```
+
+O deploy exige os secrets `SSH_HOST`, `SSH_USER` e `SSH_PRIVATE_KEY` no
+repositório GitHub. Na VPS, o serviço deve se chamar `tv-player` no arquivo
+`/opt/clickmanager/docker-compose.prod.yml`.
