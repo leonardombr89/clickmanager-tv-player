@@ -11,3 +11,7 @@ npm-debug.log*
 /android/local.properties
 /android/**/build
 /android/.kotlin
+/android/.signing
+/android/*.jks
+/android/keystore.properties
+/src/assets/downloads/*.apk

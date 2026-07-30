@@ -24,7 +24,19 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/assets"],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets",
+                "ignore": ["downloads/**"]
+              },
+              {
+                "glob": "*.apk",
+                "input": "src/assets/downloads",
+                "output": "downloads"
+              }
+            ],
             "styles": [
               "src/styles.scss",
               "src/assets/legacy-player.css"

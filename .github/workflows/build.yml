@@ -36,12 +36,96 @@ permissions:
   packages: write
 
 jobs:
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test Android player
+        run: ./gradlew testDevelopmentDebugUnitTest
+
+      - name: Lint Android player
+        run: ./gradlew lintDevelopmentDebug
+
+      - name: Build preview APK
+        if: github.event_name == 'pull_request'
+        run: |
+          ./gradlew assembleProductionDebug
+          mkdir -p build-apk
+          cp app/build/outputs/apk/production/debug/app-production-debug.apk \
+            build-apk/clicktv-player.apk
+
+      - name: Validate Android signing secrets
+        if: github.event_name != 'pull_request'
+        env:
+          CLICKTV_KEYSTORE_BASE64: ${{ secrets.CLICKTV_ANDROID_KEYSTORE_BASE64 }}
+          CLICKTV_KEYSTORE_PASSWORD: ${{ secrets.CLICKTV_ANDROID_KEYSTORE_PASSWORD }}
+          CLICKTV_KEY_ALIAS: ${{ secrets.CLICKTV_ANDROID_KEY_ALIAS }}
+          CLICKTV_KEY_PASSWORD: ${{ secrets.CLICKTV_ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$CLICKTV_KEYSTORE_BASE64"
+          test -n "$CLICKTV_KEYSTORE_PASSWORD"
+          test -n "$CLICKTV_KEY_ALIAS"
+          test -n "$CLICKTV_KEY_PASSWORD"
+
+      - name: Prepare Android signing key
+        if: github.event_name != 'pull_request'
+        env:
+          CLICKTV_KEYSTORE_BASE64: ${{ secrets.CLICKTV_ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$CLICKTV_KEYSTORE_BASE64" | base64 --decode > clicktv-release.jks
+
+      - name: Build signed production APK
+        if: github.event_name != 'pull_request'
+        env:
+          CLICKTV_KEYSTORE_PATH: ${{ github.workspace }}/android/clicktv-release.jks
+          CLICKTV_KEYSTORE_PASSWORD: ${{ secrets.CLICKTV_ANDROID_KEYSTORE_PASSWORD }}
+          CLICKTV_KEY_ALIAS: ${{ secrets.CLICKTV_ANDROID_KEY_ALIAS }}
+          CLICKTV_KEY_PASSWORD: ${{ secrets.CLICKTV_ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleProductionRelease
+          mkdir -p build-apk
+          cp app/build/outputs/apk/production/release/app-production-release.apk \
+            build-apk/clicktv-player.apk
+
+      - name: Verify signed production APK
+        if: github.event_name != 'pull_request'
+        run: "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build-apk/clicktv-player.apk
+
+      - name: Publish APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clicktv-production-apk
+          path: android/build-apk/clicktv-player.apk
+          if-no-files-found: error
+          retention-days: 30
+
   web-and-docker:
+    needs: android
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: clicktv-production-apk
+          path: src/assets/downloads
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -80,39 +164,3 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:latest
             ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:${{ github.sha }}
-
-  android:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: android
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Test Android player
-        run: ./gradlew testDevelopmentDebugUnitTest
-
-      - name: Lint Android player
-        run: ./gradlew lintDevelopmentDebug
-
-      - name: Build development APK
-        run: ./gradlew assembleDevelopmentDebug
-
-      - name: Publish development APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: clickmanager-tv-player-development-${{ github.sha }}
-          path: android/app/build/outputs/apk/development/debug/app-development-debug.apk
-          if-no-files-found: error
-          retention-days: 30

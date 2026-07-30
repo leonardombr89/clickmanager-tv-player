@@ -74,6 +74,10 @@ O contêiner Android TV em Kotlin e Jetpack Compose está em
 WebView, mantendo a URL configurável no aparelho para testes locais,
 homologação e produção.
 
+Em produção, a página `https://tv.clickmanager.com.br/download` apresenta as
+instruções de instalação e entrega o APK mais recente pelo endereço estável
+`https://tv.clickmanager.com.br/downloads/clicktv-player.apk`.
+
 ## CI/CD
 
 O GitHub Actions valida o player web e Android a cada pull request. Ao publicar
@@ -82,8 +86,9 @@ na branch `main`, o pipeline:
 1. executa testes, lint e build de produção do Angular;
 2. valida o player legado;
 3. executa testes e lint do Android;
-4. gera o APK de desenvolvimento como artefato;
-5. publica a imagem Docker no GHCR com as tags `latest` e SHA;
+4. gera e verifica o APK de produção assinado;
+5. incorpora o APK ao site e publica a imagem Docker no GHCR com as tags
+   `latest` e SHA;
 6. após sucesso, atualiza somente o serviço `tv-player` na VPS.
 
 Imagem oficial:
@@ -92,6 +97,11 @@ Imagem oficial:
 ghcr.io/leonardombr89/clickmanager-tv-player:latest
 ```
 
-O deploy exige os secrets `SSH_HOST`, `SSH_USER` e `SSH_PRIVATE_KEY` no
-repositório GitHub. Na VPS, o serviço deve se chamar `tv-player` no arquivo
-`/opt/clickmanager/docker-compose.prod.yml`.
+O deploy exige os secrets `SSH_HOST`, `SSH_USER` e `SSH_PRIVATE_KEY`. A
+assinatura Android usa `CLICKTV_ANDROID_KEYSTORE_BASE64`,
+`CLICKTV_ANDROID_KEYSTORE_PASSWORD`, `CLICKTV_ANDROID_KEY_ALIAS` e
+`CLICKTV_ANDROID_KEY_PASSWORD`. Na VPS, o serviço deve se chamar `tv-player` no
+arquivo `/opt/clickmanager/docker-compose.prod.yml`.
+
+A chave de assinatura é permanente: sua cópia local deve ser preservada para
+que novas versões possam atualizar o aplicativo já instalado.
