@@ -13,6 +13,31 @@ npm start
 Por padrão, o frontend fica em `http://localhost:4200` e usa a API em
 `http://localhost:8080`. Para alterar a API local, edite `src/assets/env.js`.
 
+Para testar em uma TV na mesma rede, mantenha o backend na porta `8080` e use:
+
+```bash
+npm run start:lan
+```
+
+O player ficará disponível na porta `4300` de todos os endereços locais da
+máquina. O endereço da API é calculado automaticamente com o mesmo host usado
+para abrir o player.
+
+## Smart TVs legadas
+
+O mesmo endereço detecta automaticamente navegadores antigos e carrega um
+player ES5 independente do Angular. O modo legado suporta:
+
+- Samsung Tizen anterior à versão 8, incluindo a UN40J5500 com Tizen 2.3;
+- ativação por código e credencial permanente;
+- sincronização periódica e heartbeat;
+- imagens e vídeos;
+- repetição contínua e avanço quando uma mídia falha;
+- atualização da playlist ao finalizar a mídia atual.
+
+Para validar o modo legado em um navegador moderno, acrescente `?legacy=1` à
+URL. Esse parâmetro é apenas uma ferramenta de diagnóstico.
+
 ## Configuração Docker
 
 ```bash
@@ -41,3 +66,10 @@ Variáveis:
 
 A credencial permanente fica somente no armazenamento local do navegador e é
 enviada exclusivamente no header `Authorization`.
+
+## Player Android
+
+O contêiner Android TV em Kotlin e Jetpack Compose está em
+[`android/`](android/README.md). Ele carrega este mesmo player Angular em uma
+WebView, mantendo a URL configurável no aparelho para testes locais,
+homologação e produção.

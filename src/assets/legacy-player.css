@@ -1,0 +1,314 @@
+/* Compatibilidade para Smart TVs antigas. Todo o CSS fica isolado neste escopo. */
+.clicktv-legacy,
+.clicktv-legacy * {
+  box-sizing: border-box;
+}
+
+.clicktv-legacy {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  color: #111827;
+  background: #eef2ff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.clicktv-legacy__status {
+  display: table;
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  background: #eef2ff;
+}
+
+.clicktv-legacy__center {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.clicktv-legacy__brand {
+  position: absolute;
+  top: 34px;
+  left: 42px;
+  color: #312e81;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.clicktv-legacy__brand-mark {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  margin-right: 12px;
+  color: #ffffff;
+  line-height: 48px;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 12px;
+  background: #4338ca;
+}
+
+.clicktv-legacy__brand-tv {
+  color: #6366f1;
+}
+
+.clicktv-legacy__card {
+  display: inline-block;
+  width: 760px;
+  max-width: 86%;
+  padding: 56px 46px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 30px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(49, 46, 129, 0.18);
+}
+
+.clicktv-legacy__eyebrow {
+  margin-bottom: 18px;
+  color: #4338ca;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.clicktv-legacy__code {
+  margin: 0 0 28px;
+  color: #312e81;
+  font-family: "Courier New", monospace;
+  font-size: 94px;
+  font-weight: bold;
+  line-height: 1;
+  letter-spacing: 8px;
+}
+
+.clicktv-legacy__title {
+  margin: 0 0 16px;
+  color: #111827;
+  font-size: 42px;
+  line-height: 1.12;
+}
+
+.clicktv-legacy__message {
+  margin: 0 auto;
+  color: #475569;
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+.clicktv-legacy__waiting {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 20px;
+  color: #4338ca;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 22px;
+  background: #e0e7ff;
+}
+
+.clicktv-legacy__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #6366f1;
+  -webkit-animation: clicktvLegacyPulse 1.6s infinite;
+  animation: clicktvLegacyPulse 1.6s infinite;
+}
+
+.clicktv-legacy__spinner {
+  display: inline-block;
+  width: 66px;
+  height: 66px;
+  margin-bottom: 28px;
+  border: 6px solid #e0e7ff;
+  border-top-color: #4338ca;
+  border-radius: 50%;
+  -webkit-animation: clicktvLegacySpin 0.9s linear infinite;
+  animation: clicktvLegacySpin 0.9s linear infinite;
+}
+
+.clicktv-legacy__icon {
+  display: inline-block;
+  width: 78px;
+  height: 78px;
+  margin-bottom: 26px;
+  color: #4338ca;
+  font-size: 44px;
+  line-height: 78px;
+  border-radius: 22px;
+  background: #e0e7ff;
+}
+
+.clicktv-legacy__button {
+  min-width: 250px;
+  min-height: 64px;
+  margin-top: 30px;
+  padding: 15px 28px;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 21px;
+  font-weight: bold;
+  border: 0;
+  border-radius: 16px;
+  background: #4338ca;
+  box-shadow: 0 14px 32px rgba(67, 56, 202, 0.28);
+}
+
+.clicktv-legacy__button:focus {
+  outline: 5px solid #818cf8;
+  outline-offset: 4px;
+}
+
+.clicktv-legacy__stage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  background: #000000;
+}
+
+.clicktv-legacy__media {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  opacity: 0;
+  -webkit-transition: opacity 500ms ease-in-out;
+  transition: opacity 500ms ease-in-out;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background: #000000;
+}
+
+.clicktv-legacy__media--visible {
+  opacity: 1;
+}
+
+video.clicktv-legacy__media {
+  width: 100%;
+  height: 100%;
+}
+
+.clicktv-legacy__interaction {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: table;
+  width: 100%;
+  height: 100%;
+  color: #ffffff;
+  text-align: center;
+  background: rgba(17, 24, 39, 0.88);
+}
+
+.clicktv-legacy__interaction-center {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.clicktv-legacy__interaction .clicktv-legacy__message {
+  margin-top: 18px;
+  color: #e0e7ff;
+}
+
+.clicktv-legacy__offline {
+  position: absolute;
+  z-index: 20;
+  bottom: 22px;
+  left: 22px;
+  padding: 11px 17px;
+  color: #312e81;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #818cf8;
+  border-radius: 22px;
+  background: #ffffff;
+}
+
+.clicktv-legacy__reset {
+  position: absolute;
+  z-index: 20;
+  top: 18px;
+  right: 18px;
+  width: 48px;
+  height: 48px;
+  color: #ffffff;
+  font-size: 25px;
+  border: 1px solid #818cf8;
+  border-radius: 12px;
+  background: #312e81;
+}
+
+@media (max-width: 700px) {
+  .clicktv-legacy__status {
+    padding: 20px;
+  }
+
+  .clicktv-legacy__brand {
+    top: 18px;
+    left: 20px;
+    font-size: 22px;
+  }
+
+  .clicktv-legacy__brand-mark {
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+  }
+
+  .clicktv-legacy__card {
+    max-width: 92%;
+    padding: 40px 24px;
+  }
+
+  .clicktv-legacy__code {
+    font-size: 62px;
+  }
+
+  .clicktv-legacy__title {
+    font-size: 32px;
+  }
+
+  .clicktv-legacy__message {
+    font-size: 19px;
+  }
+}
+
+@-webkit-keyframes clicktvLegacySpin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes clicktvLegacySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes clicktvLegacyPulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes clicktvLegacyPulse {
+  50% {
+    opacity: 0.3;
+  }
+}

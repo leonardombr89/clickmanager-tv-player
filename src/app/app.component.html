@@ -11,7 +11,12 @@
 
     @if (!interactionStarted()) {
       <div class="interaction-layer">
-        <button class="primary-action" type="button" (click)="startExperience()">
+        <button
+          #startButton
+          class="primary-action"
+          type="button"
+          (click)="startExperience()"
+        >
           <span class="play-icon" aria-hidden="true">▶</span>
           Iniciar reprodução
         </button>
@@ -110,13 +115,15 @@
     </div>
   }
 
-  <button
-    class="reset-device"
-    type="button"
-    aria-label="Redefinir dispositivo"
-    title="Redefinir dispositivo"
-    (click)="resetDevice()"
-  >
-    <span aria-hidden="true">↻</span>
-  </button>
+  @if (!player.configuration()?.itens?.length) {
+    <button
+      class="reset-device"
+      type="button"
+      aria-label="Redefinir dispositivo"
+      title="Redefinir dispositivo"
+      (click)="resetDevice()"
+    >
+      <span aria-hidden="true">↻</span>
+    </button>
+  }
 </main>

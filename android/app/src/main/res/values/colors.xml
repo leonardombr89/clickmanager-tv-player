@@ -1,0 +1,6 @@
+<resources>
+    <color name="clicktv_primary">#4338CA</color>
+    <color name="clicktv_primary_dark">#312E81</color>
+    <color name="clicktv_secondary">#6366F1</color>
+    <color name="clicktv_background">#FFFFFF</color>
+</resources>

@@ -16,11 +16,16 @@ describe('PlaybackComponent', () => {
 
     expect(component.currentItem?.id).toBe(1);
     component.onImageLoaded();
+    expect(component.mediaVisible).toBeTrue();
     tick(1999);
     expect(component.currentItem?.id).toBe(1);
     tick(1);
+    expect(component.currentItem?.id).toBe(1);
+    expect(component.mediaVisible).toBeFalse();
+    tick(500);
     expect(component.currentItem?.id).toBe(2);
     component.onVideoEnded();
+    tick(500);
     expect(component.currentItem?.id).toBe(1);
   }));
 
@@ -33,27 +38,48 @@ describe('PlaybackComponent', () => {
     tick(30_000);
     expect(component.currentItem?.id).toBe(1);
     component.onVideoEnded();
+    expect(component.mediaVisible).toBeFalse();
+    tick(500);
     expect(component.currentItem?.id).toBe(2);
   }));
 
-  it('avança após erro e aplica atualização somente ao terminar o item atual', () => {
+  it('avança após erro e aplica atualização somente ao terminar o item atual', fakeAsync(() => {
     component.items = [item(1, 1, 'VIDEO', null), item(2, 2, 'IMAGEM', 1)];
     component.items = [item(3, 1, 'IMAGEM', 1)];
 
     expect(component.currentItem?.id).toBe(1);
     component.onMediaError();
+    tick(499);
+    expect(component.currentItem?.id).toBe(1);
+    tick(1);
     expect(component.currentItem?.id).toBe(3);
-  });
+  }));
 
   it('repete playlist de item único sem travar', fakeAsync(() => {
     const changes: Array<number | undefined> = [];
     component.mediaChange.subscribe((id) => changes.push(id));
     component.items = [item(1, 1, 'IMAGEM', 1)];
     component.onImageLoaded();
-    tick(1000);
+    tick(1500);
 
     expect(component.currentItem?.id).toBe(1);
     expect(changes).toEqual([11, 11]);
+  }));
+
+  it('só revela a próxima mídia depois que ela estiver pronta', fakeAsync(() => {
+    component.items = [item(1, 1, 'IMAGEM', 1), item(2, 2, 'VIDEO', null)];
+    component.onImageLoaded();
+
+    tick(1000);
+    expect(component.mediaVisible).toBeFalse();
+    tick(500);
+    expect(component.currentItem?.id).toBe(2);
+    expect(component.mediaVisible).toBeFalse();
+
+    const video = jasmine.createSpyObj<HTMLVideoElement>('video', ['play']);
+    video.play.and.returnValue(Promise.resolve());
+    component.onVideoReady(video);
+    expect(component.mediaVisible).toBeTrue();
   }));
 
   function item(

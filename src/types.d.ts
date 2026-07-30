@@ -5,4 +5,8 @@ interface Window {
     heartbeatIntervalSeconds?: number;
     activationPollIntervalSeconds?: number;
   };
+  __CLICKTV_LEGACY__?: boolean;
+  __CLICKTV_LEGACY_COMPAT__?: {
+    shouldUseLegacy(userAgent: string, moduleSupport: boolean): boolean;
+  };
 }

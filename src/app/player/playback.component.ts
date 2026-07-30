@@ -18,11 +18,14 @@ export class PlaybackComponent implements OnDestroy {
 
   currentItem: PlayerItem | null = null;
   mediaUrl = '';
+  mediaVisible = false;
 
   private activeItems: PlayerItem[] = [];
   private pendingItems: PlayerItem[] | null = null;
   private currentIndex = 0;
   private mediaTimer?: number;
+  private transitionTimer?: number;
+  private transitionInProgress = false;
   private generation = 0;
 
   @Input()
@@ -38,35 +41,58 @@ export class PlaybackComponent implements OnDestroy {
   }
 
   onImageLoaded(): void {
+    this.revealMedia();
     this.clearMediaTimer();
     const duration = Math.max(1, this.currentItem?.duracaoSegundos ?? 5);
-    this.mediaTimer = window.setTimeout(() => this.advance(), duration * 1000);
+    this.mediaTimer = window.setTimeout(
+      () => this.startTransition(),
+      duration * 1000
+    );
   }
 
   onVideoReady(video: HTMLVideoElement): void {
+    this.revealMedia();
     void video.play().catch(() => undefined);
     this.clearMediaTimer();
     const duration = this.currentItem?.duracaoSegundos;
     if (duration && duration > 0) {
-      this.mediaTimer = window.setTimeout(() => this.advance(), duration * 1000);
+      this.mediaTimer = window.setTimeout(
+        () => this.startTransition(),
+        duration * 1000
+      );
     }
   }
 
   onVideoEnded(): void {
-    this.advance();
+    this.startTransition();
   }
 
   onMediaError(): void {
-    this.advance();
+    this.startTransition();
   }
 
   ngOnDestroy(): void {
     this.clearMediaTimer();
+    this.clearTransitionTimer();
     this.mediaChange.emit(undefined);
   }
 
-  private advance(): void {
+  private startTransition(): void {
+    if (this.transitionInProgress) {
+      return;
+    }
+
     this.clearMediaTimer();
+    this.transitionInProgress = true;
+    this.mediaVisible = false;
+    this.transitionTimer = window.setTimeout(() => {
+      this.transitionTimer = undefined;
+      this.advance();
+      this.transitionInProgress = false;
+    }, TRANSITION_DURATION_MS);
+  }
+
+  private advance(): void {
     if (this.pendingItems) {
       const pending = this.pendingItems;
       this.pendingItems = null;
@@ -89,6 +115,7 @@ export class PlaybackComponent implements OnDestroy {
 
   private setCurrent(item: PlayerItem | null): void {
     this.generation += 1;
+    this.mediaVisible = false;
     this.currentItem = item;
     this.mediaUrl = item ? `${item.midia.url}#clicktv-${this.generation}` : '';
     this.mediaChange.emit(item?.midia.id);
@@ -112,4 +139,18 @@ export class PlaybackComponent implements OnDestroy {
       this.mediaTimer = undefined;
     }
   }
+
+  private clearTransitionTimer(): void {
+    if (this.transitionTimer !== undefined) {
+      window.clearTimeout(this.transitionTimer);
+      this.transitionTimer = undefined;
+    }
+    this.transitionInProgress = false;
+  }
+
+  private revealMedia(): void {
+    this.mediaVisible = true;
+  }
 }
+
+const TRANSITION_DURATION_MS = 500;

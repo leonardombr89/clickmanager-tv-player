@@ -1,0 +1,12 @@
+<resources>
+    <style name="Theme.ClickTV" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">@color/clicktv_secondary</item>
+        <item name="android:navigationBarColor">@color/clicktv_primary_dark</item>
+        <item name="android:statusBarColor">@color/clicktv_primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

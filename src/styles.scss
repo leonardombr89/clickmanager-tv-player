@@ -2,7 +2,7 @@
   color-scheme: dark;
   font-family:
     Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #000;
+  background: #eef2ff;
 }
 
 html,
@@ -15,7 +15,7 @@ app-root {
 }
 
 body {
-  background: #000;
+  background: #eef2ff;
   overscroll-behavior: none;
   touch-action: manipulation;
   user-select: none;
@@ -27,6 +27,6 @@ button {
 }
 
 button:focus-visible {
-  outline: 3px solid #b7afff;
+  outline: 3px solid #818cf8;
   outline-offset: 4px;
 }

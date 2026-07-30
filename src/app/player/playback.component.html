@@ -3,6 +3,7 @@
     @if (item.midia.tipo === 'IMAGEM') {
       <img
         class="media"
+        [class.media-visible]="mediaVisible"
         [src]="mediaUrl"
         [alt]="item.midia.nome"
         draggable="false"
@@ -13,6 +14,7 @@
       <video
         #video
         class="media"
+        [class.media-visible]="mediaVisible"
         [src]="mediaUrl"
         [attr.aria-label]="item.midia.nome"
         autoplay

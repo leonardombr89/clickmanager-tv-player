@@ -1,4 +1,12 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  computed,
+  signal
+} from '@angular/core';
 import { PlayerFacadeService } from './core/player-facade.service';
 import { WakeLockService } from './core/wake-lock.service';
 import { PlaybackComponent } from './player/playback.component';
@@ -25,6 +33,11 @@ export class AppComponent implements OnInit, OnDestroy {
     readonly player: PlayerFacadeService,
     private readonly wakeLock: WakeLockService
   ) {}
+
+  @ViewChild('startButton')
+  set startButton(button: ElementRef<HTMLButtonElement> | undefined) {
+    button?.nativeElement.focus();
+  }
 
   ngOnInit(): void {
     this.player.start();

@@ -19,8 +19,15 @@
   object-fit: contain;
   object-position: center;
   background: #000;
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
   user-select: none;
   -webkit-user-drag: none;
+  will-change: opacity;
+}
+
+.media-visible {
+  opacity: 1;
 }
 
 .empty-frame {
