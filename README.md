@@ -23,6 +23,17 @@ O player ficará disponível na porta `4300` de todos os endereços locais da
 máquina. O endereço da API é calculado automaticamente com o mesmo host usado
 para abrir o player.
 
+## Testar e gerar o build
+
+```bash
+npm test
+npm run test:legacy
+npm run lint
+npm run build:prod
+```
+
+O build web é gerado em `dist/clickmanager-tv-player/browser`.
+
 ## Smart TVs legadas
 
 O mesmo endereço detecta automaticamente navegadores antigos e carrega um
@@ -46,8 +57,10 @@ docker run --rm -p 8081:80 \
   -e CLICKTV_API_BASE_URL=https://api.clickmanager.com.br \
   -e CLICKTV_SYNC_INTERVAL_SECONDS=60 \
   -e CLICKTV_HEARTBEAT_INTERVAL_SECONDS=30 \
-  clickmanager-tv-player
+    clickmanager-tv-player
 ```
+
+Acesse `http://localhost:8081`.
 
 Variáveis:
 
@@ -105,3 +118,12 @@ arquivo `/opt/clickmanager/docker-compose.prod.yml`.
 
 A chave de assinatura é permanente: sua cópia local deve ser preservada para
 que novas versões possam atualizar o aplicativo já instalado.
+
+Deploy manual na VPS:
+
+```bash
+cd /opt/clickmanager
+docker-compose -f docker-compose.prod.yml pull tv-player
+docker-compose -f docker-compose.prod.yml up -d --no-deps tv-player
+docker-compose -f docker-compose.prod.yml ps tv-player
+```
