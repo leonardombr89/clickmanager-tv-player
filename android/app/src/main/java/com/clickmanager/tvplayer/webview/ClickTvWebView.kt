@@ -1,6 +1,9 @@
 package com.clickmanager.tvplayer.webview
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Color
 import android.util.Log
 import android.view.ViewGroup
@@ -51,7 +54,11 @@ fun ClickTvWebView(
                 webChromeClient = WebChromeClient()
                 webViewClient = ClickTvWebViewClient(url, callbacks)
                 addJavascriptInterface(
-                    ClickTvJavascriptBridge(deviceInfoProvider, controller),
+                    ClickTvJavascriptBridge(
+                        deviceInfoProvider,
+                        controller,
+                        context.findActivity()
+                    ),
                     BRIDGE_NAME
                 )
                 controller.attach(this)
@@ -76,3 +83,9 @@ fun ClickTvWebView(
 
 private const val TAG = "ClickTV/WebView"
 private const val BRIDGE_NAME = "ClickTV"
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}

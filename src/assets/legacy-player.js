@@ -118,6 +118,9 @@
 
     this.credentialKey = 'clicktv.device.credential';
     this.activationKey = 'clicktv.device.activation';
+    this.orientationKey = 'clicktv.screen.orientation';
+    this.landscapeLocked =
+      storageRead(window.localStorage, this.orientationKey) === 'landscape';
     this.credential = null;
     this.activation = null;
     this.configuration = null;
@@ -143,6 +146,10 @@
     var credential = storageRead(window.localStorage, this.credentialKey);
     var pendingRaw;
     var pending;
+
+    if (this.landscapeLocked) {
+      this.applyOrientation('landscape');
+    }
 
     if (credential) {
       this.startAuthenticated(credential);
@@ -609,6 +616,54 @@
     }
   };
 
+  LegacyPlayer.prototype.applyOrientation = function (mode) {
+    if (window.ClickTV && typeof window.ClickTV.setOrientation === 'function') {
+      try {
+        window.ClickTV.setOrientation(mode);
+      } catch (ignored) {
+        return;
+      }
+    }
+  };
+
+  LegacyPlayer.prototype.toggleOrientation = function () {
+    var mode = this.landscapeLocked ? 'automatic' : 'landscape';
+    var button;
+    this.landscapeLocked = mode === 'landscape';
+    storageWrite(window.localStorage, this.orientationKey, mode);
+    this.applyOrientation(mode);
+    button = document.getElementById('clicktv-legacy-orientation');
+    if (button) {
+      button.title = this.landscapeLocked
+        ? 'Rotação automática'
+        : 'Orientação paisagem';
+      button.innerHTML =
+        '<span class="clicktv-legacy__orientation-icon"></span>' +
+        (this.landscapeLocked ? 'Automática' : 'Paisagem');
+    }
+  };
+
+  LegacyPlayer.prototype.orientationControlHtml = function () {
+    if (!window.ClickTV || typeof window.ClickTV.setOrientation !== 'function') {
+      return '';
+    }
+    return (
+      '<button id="clicktv-legacy-orientation" ' +
+      'class="clicktv-legacy__orientation" type="button" title="' +
+      (this.landscapeLocked ? 'Rotação automática' : 'Orientação paisagem') +
+      '"><span class="clicktv-legacy__orientation-icon"></span>' +
+      (this.landscapeLocked ? 'Automática' : 'Paisagem') +
+      '</button>'
+    );
+  };
+
+  LegacyPlayer.prototype.bindOrientationControl = function () {
+    var self = this;
+    this.bindClick('clicktv-legacy-orientation', function () {
+      self.toggleOrientation();
+    });
+  };
+
   LegacyPlayer.prototype.renderPlaybackShell = function () {
     var self = this;
     var interaction = this.interactionStarted
@@ -623,11 +678,13 @@
     this.root.innerHTML =
       '<div class="clicktv-legacy__stage" id="clicktv-legacy-stage"></div>' +
       interaction +
-      '<div id="clicktv-legacy-offline"></div>';
+      '<div id="clicktv-legacy-offline"></div>' +
+      this.orientationControlHtml();
     this.bindClick('clicktv-legacy-start', function () {
       self.startExperience();
     });
     this.focusElement('clicktv-legacy-start');
+    this.bindOrientationControl();
     this.updateConnectionDisplay();
   };
 
@@ -735,11 +792,13 @@
       '<div class="clicktv-legacy__card">' + content + '</div>' +
       '</div></div>' +
       '<div id="clicktv-legacy-offline"></div>' +
+      this.orientationControlHtml() +
       '<button id="clicktv-legacy-reset" class="clicktv-legacy__reset" ' +
       'type="button" title="Redefinir dispositivo">↻</button>';
     this.bindClick('clicktv-legacy-reset', function () {
       self.resetDevice();
     });
+    this.bindOrientationControl();
     this.updateConnectionDisplay();
   };
 

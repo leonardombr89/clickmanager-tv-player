@@ -19,8 +19,12 @@ describe('AppComponent', () => {
     resetDevice: jasmine.Spy;
     retry: jasmine.Spy;
   };
+  let setOrientation: jasmine.Spy;
 
   beforeEach(async () => {
+    window.localStorage.removeItem('clicktv.screen.orientation');
+    setOrientation = jasmine.createSpy('setOrientation').and.returnValue(true);
+    window.ClickTV = { setOrientation };
     facade = {
       state: signal<PlayerVisualState>('AGUARDANDO_ATIVACAO'),
       activation: signal({
@@ -54,6 +58,11 @@ describe('AppComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    delete window.ClickTV;
+    window.localStorage.removeItem('clicktv.screen.orientation');
+  });
+
   it('exibe o código, mas nunca identificador ou credencial', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('123 456');
@@ -69,5 +78,16 @@ describe('AppComponent', () => {
     (window.confirm as jasmine.Spy).and.returnValue(true);
     fixture.componentInstance.resetDevice();
     expect(facade.resetDevice).toHaveBeenCalled();
+  });
+
+  it('alterna entre paisagem e rotação automática no app Android', () => {
+    fixture.componentInstance.toggleOrientation();
+    expect(setOrientation).toHaveBeenCalledWith('landscape');
+    expect(fixture.componentInstance.landscapeLocked()).toBeTrue();
+    expect(window.localStorage.getItem('clicktv.screen.orientation')).toBe('landscape');
+
+    fixture.componentInstance.toggleOrientation();
+    expect(setOrientation).toHaveBeenCalledWith('automatic');
+    expect(fixture.componentInstance.landscapeLocked()).toBeFalse();
   });
 });

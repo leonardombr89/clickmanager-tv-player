@@ -121,16 +121,33 @@
     </div>
   }
 
-  @if (!player.configuration()?.itens?.length) {
-    <button
-      class="reset-device"
-      type="button"
-      aria-label="Redefinir dispositivo"
-      title="Redefinir dispositivo"
-      (click)="resetDevice()"
-    >
-      <span aria-hidden="true">↻</span>
-    </button>
+  @if (nativeAndroidApp || !player.configuration()?.itens?.length) {
+    <div class="device-controls">
+      @if (nativeAndroidApp) {
+        <button
+          class="orientation-toggle"
+          type="button"
+          [attr.aria-label]="landscapeLocked() ? 'Usar rotação automática' : 'Usar orientação paisagem'"
+          [attr.title]="landscapeLocked() ? 'Rotação automática' : 'Orientação paisagem'"
+          (click)="toggleOrientation()"
+        >
+          <span class="orientation-icon" aria-hidden="true"></span>
+          <span>{{ landscapeLocked() ? 'Automática' : 'Paisagem' }}</span>
+        </button>
+      }
+
+      @if (!player.configuration()?.itens?.length) {
+        <button
+          class="reset-device"
+          type="button"
+          aria-label="Redefinir dispositivo"
+          title="Redefinir dispositivo"
+          (click)="resetDevice()"
+        >
+          <span aria-hidden="true">↻</span>
+        </button>
+      }
+    </div>
   }
 </main>
 }

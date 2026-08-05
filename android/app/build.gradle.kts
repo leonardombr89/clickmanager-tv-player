@@ -19,8 +19,8 @@ android {
         versionCode = providers.environmentVariable("CLICKTV_VERSION_CODE")
             .orNull
             ?.toIntOrNull()
-            ?: 4
-        versionName = "1.0.2"
+            ?: 5
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
