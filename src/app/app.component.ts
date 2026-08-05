@@ -11,6 +11,7 @@ import { PlayerFacadeService } from './core/player-facade.service';
 import { WakeLockService } from './core/wake-lock.service';
 import { DownloadPageComponent } from './download/download-page.component';
 import { PlaybackComponent } from './player/playback.component';
+import { PrivacyPageComponent } from './privacy/privacy-page.component';
 
 type OrientationMode = 'automatic' | 'landscape';
 
@@ -29,12 +30,15 @@ const ORIENTATION_STORAGE_KEY = 'clicktv.screen.orientation';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [DownloadPageComponent, PlaybackComponent],
+  imports: [DownloadPageComponent, PlaybackComponent, PrivacyPageComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
   readonly downloadPage = window.location.pathname.replace(/\/+$/, '') === '/download';
+  readonly privacyPage = ['/privacidade', '/privacy'].includes(
+    window.location.pathname.replace(/\/+$/, '')
+  );
   readonly interactionStarted = signal(false);
   readonly nativeAndroidApp = typeof window.ClickTV?.setOrientation === 'function';
   readonly landscapeLocked = signal(
@@ -60,7 +64,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!this.downloadPage) {
+    if (!this.downloadPage && !this.privacyPage) {
       if (this.landscapeLocked()) {
         this.applyOrientation('landscape');
       }
@@ -69,7 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (!this.downloadPage) {
+    if (!this.downloadPage && !this.privacyPage) {
       this.player.shutdown();
     }
     void this.wakeLock.release();

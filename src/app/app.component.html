@@ -1,4 +1,6 @@
-@if (downloadPage) {
+@if (privacyPage) {
+  <app-privacy-page />
+} @else if (downloadPage) {
   <app-download-page />
 } @else {
 <main
@@ -56,6 +58,9 @@
             </div>
             <a class="download-link" href="/download">
               Baixar aplicativo para Android
+            </a>
+            <a class="privacy-link" href="/privacidade">
+              Política de Privacidade
             </a>
           </div>
         }

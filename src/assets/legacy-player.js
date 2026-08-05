@@ -793,6 +793,8 @@
       '</div></div>' +
       '<div id="clicktv-legacy-offline"></div>' +
       this.orientationControlHtml() +
+      '<a class="clicktv-legacy__privacy" href="/privacidade">' +
+      'Política de Privacidade</a>' +
       '<button id="clicktv-legacy-reset" class="clicktv-legacy__reset" ' +
       'type="button" title="Redefinir dispositivo">↻</button>';
     this.bindClick('clicktv-legacy-reset', function () {
