@@ -18,6 +18,7 @@
     <application
         android:name=".ClickTvApplication"
         android:allowBackup="false"
+        android:appCategory="video"
         android:banner="@drawable/clicktv_banner"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_clicktv"
@@ -30,8 +31,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|uiMode"
-            android:exported="true"
-            android:screenOrientation="landscape">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

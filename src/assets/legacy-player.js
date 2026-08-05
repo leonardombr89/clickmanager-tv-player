@@ -483,7 +483,7 @@
     }
     this.heartbeatRequestActive = true;
     payload = {
-      versaoPlayer: '0.1.0-legacy',
+      versaoPlayer: '1.0.2-legacy',
       versaoConfiguracao:
         current && current.tela
           ? current.tela.versaoConfiguracao

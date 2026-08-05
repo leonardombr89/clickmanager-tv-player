@@ -14,8 +14,13 @@ android {
         applicationId = "com.clickmanager.tvplayer"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        // O APK 0.1.0 (versionCode 1) já foi distribuído diretamente.
+        // A primeira versão da Play precisa ser superior para atualizar essas instalações.
+        versionCode = providers.environmentVariable("CLICKTV_VERSION_CODE")
+            .orNull
+            ?.toIntOrNull()
+            ?: 4
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -76,6 +81,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk.debugSymbolLevel = "SYMBOL_TABLE"
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

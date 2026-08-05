@@ -99,7 +99,7 @@ na branch `main`, o pipeline:
 1. executa testes, lint e build de produção do Angular;
 2. valida o player legado;
 3. executa testes e lint do Android;
-4. gera e verifica o APK de produção assinado;
+4. gera e verifica o APK e o App Bundle de produção assinados;
 5. incorpora o APK ao site e publica a imagem Docker no GHCR com as tags
    `latest` e SHA;
 6. após sucesso, atualiza somente o serviço `tv-player` na VPS.
@@ -113,11 +113,28 @@ ghcr.io/leonardombr89/clickmanager-tv-player:latest
 O deploy exige os secrets `SSH_HOST`, `SSH_USER` e `SSH_PRIVATE_KEY`. A
 assinatura Android usa `CLICKTV_ANDROID_KEYSTORE_BASE64`,
 `CLICKTV_ANDROID_KEYSTORE_PASSWORD`, `CLICKTV_ANDROID_KEY_ALIAS` e
-`CLICKTV_ANDROID_KEY_PASSWORD`. Na VPS, o serviço deve se chamar `tv-player` no
-arquivo `/opt/clickmanager/docker-compose.prod.yml`.
+`CLICKTV_ANDROID_KEY_PASSWORD`. O envio automático para o teste interno usa o
+secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, contendo o JSON completo de uma
+conta de serviço autorizada no Google Play Console a publicar em faixas de
+teste. Na VPS, o serviço deve se chamar `tv-player` no arquivo
+`/opt/clickmanager/docker-compose.prod.yml`.
+
+O `versionCode` dos builds publicados pelo CI é calculado automaticamente com o
+número e a tentativa da execução do GitHub Actions. Builds locais continuam
+usando o valor declarado no Gradle.
 
 A chave de assinatura é permanente: sua cópia local deve ser preservada para
 que novas versões possam atualizar o aplicativo já instalado.
+
+Na primeira configuração do Play App Signing, a chave deste APK deve ser
+fornecida como chave de assinatura do app. Não escolha uma chave nova gerada
+pelo Google, pois isso impediria que instalações feitas pelo APK direto fossem
+atualizadas pela Play Store. O certificado esperado tem SHA-256:
+
+```text
+A1:62:A0:14:9F:C8:69:DD:C9:A0:72:00:3E:7D:9E:F6:
+DE:5E:66:59:1B:0F:8A:11:47:9D:08:C1:78:A8:F2:35
+```
 
 Deploy manual na VPS:
 

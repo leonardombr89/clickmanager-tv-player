@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  HostListener,
   Input,
   OnDestroy,
   Output
@@ -27,6 +28,7 @@ export class PlaybackComponent implements OnDestroy {
   private transitionTimer?: number;
   private transitionInProgress = false;
   private generation = 0;
+  private activeVideo?: HTMLVideoElement;
 
   @Input()
   set items(value: PlayerItem[]) {
@@ -51,15 +53,53 @@ export class PlaybackComponent implements OnDestroy {
   }
 
   onVideoReady(video: HTMLVideoElement): void {
+    this.activeVideo = video;
     this.revealMedia();
     void video.play().catch(() => undefined);
-    this.clearMediaTimer();
-    const duration = this.currentItem?.duracaoSegundos;
-    if (duration && duration > 0) {
-      this.mediaTimer = window.setTimeout(
-        () => this.startTransition(),
-        duration * 1000
-      );
+    this.scheduleVideoTimer();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onRemoteKeyDown(event: KeyboardEvent): void {
+    const video = this.activeVideo;
+    if (!video || this.currentItem?.midia.tipo !== 'VIDEO') {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Enter':
+      case ' ':
+      case 'MediaPlayPause':
+        if (event.repeat) {
+          return;
+        }
+        event.preventDefault();
+        if (video.paused) {
+          this.playVideo(video);
+        } else {
+          this.pauseVideo(video);
+        }
+        break;
+      case 'MediaPlay':
+        event.preventDefault();
+        this.playVideo(video);
+        break;
+      case 'MediaPause':
+        event.preventDefault();
+        this.pauseVideo(video);
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        video.currentTime = Math.max(0, video.currentTime - SEEK_SECONDS);
+        break;
+      case 'ArrowRight': {
+        event.preventDefault();
+        const target = video.currentTime + SEEK_SECONDS;
+        video.currentTime = Number.isFinite(video.duration)
+          ? Math.min(video.duration, target)
+          : target;
+        break;
+      }
     }
   }
 
@@ -115,6 +155,7 @@ export class PlaybackComponent implements OnDestroy {
 
   private setCurrent(item: PlayerItem | null): void {
     this.generation += 1;
+    this.activeVideo = undefined;
     this.mediaVisible = false;
     this.currentItem = item;
     this.mediaUrl = item ? `${item.midia.url}#clicktv-${this.generation}` : '';
@@ -140,6 +181,27 @@ export class PlaybackComponent implements OnDestroy {
     }
   }
 
+  private playVideo(video: HTMLVideoElement): void {
+    void video.play().catch(() => undefined);
+    this.scheduleVideoTimer();
+  }
+
+  private pauseVideo(video: HTMLVideoElement): void {
+    video.pause();
+    this.clearMediaTimer();
+  }
+
+  private scheduleVideoTimer(): void {
+    this.clearMediaTimer();
+    const duration = this.currentItem?.duracaoSegundos;
+    if (duration && duration > 0) {
+      this.mediaTimer = window.setTimeout(
+        () => this.startTransition(),
+        duration * 1000
+      );
+    }
+  }
+
   private clearTransitionTimer(): void {
     if (this.transitionTimer !== undefined) {
       window.clearTimeout(this.transitionTimer);
@@ -154,3 +216,4 @@ export class PlaybackComponent implements OnDestroy {
 }
 
 const TRANSITION_DURATION_MS = 500;
+const SEEK_SECONDS = 10;

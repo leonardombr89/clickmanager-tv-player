@@ -82,6 +82,29 @@ describe('PlaybackComponent', () => {
     expect(component.mediaVisible).toBeTrue();
   }));
 
+  it('controla vídeo com o direcional do controle remoto', () => {
+    const video = document.createElement('video');
+    const play = spyOn(video, 'play').and.returnValue(Promise.resolve());
+    const pause = spyOn(video, 'pause');
+    Object.defineProperty(video, 'paused', { value: false, configurable: true });
+    Object.defineProperty(video, 'duration', { value: 60, configurable: true });
+    video.currentTime = 20;
+    component.items = [item(1, 1, 'VIDEO', null)];
+    component.onVideoReady(video);
+
+    component.onRemoteKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(pause).toHaveBeenCalled();
+
+    Object.defineProperty(video, 'paused', { value: true, configurable: true });
+    component.onRemoteKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(play).toHaveBeenCalledTimes(2);
+
+    component.onRemoteKeyDown(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(video.currentTime).toBe(30);
+    component.onRemoteKeyDown(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    expect(video.currentTime).toBe(20);
+  });
+
   function item(
     id: number,
     order: number,

@@ -60,8 +60,21 @@ APK gerado:
 app/build/outputs/apk/development/debug/app-development-debug.apk
 ```
 
-O APK oficial de produção é gerado e assinado pelo GitHub Actions. Após o
-deploy, ele fica disponível em:
+O APK oficial de produção e o Android App Bundle da Play Store são gerados e
+assinados pelo GitHub Actions. Para gerar os dois localmente:
+
+```bash
+./gradlew assembleProductionRelease bundleProductionRelease
+```
+
+Artefatos gerados:
+
+```text
+app/build/outputs/apk/production/release/app-production-release.apk
+app/build/outputs/bundle/productionRelease/app-production-release.aab
+```
+
+Após o deploy, o APK também fica disponível em:
 
 ```text
 https://tv.clickmanager.com.br/downloads/clicktv-player.apk

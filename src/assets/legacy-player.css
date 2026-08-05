@@ -289,6 +289,69 @@ video.clicktv-legacy__media {
   }
 }
 
+@media (max-height: 600px) and (orientation: landscape) {
+  .clicktv-legacy__status {
+    padding: 12px 64px;
+  }
+
+  .clicktv-legacy__brand {
+    top: 12px;
+    left: 14px;
+    font-size: 18px;
+  }
+
+  .clicktv-legacy__brand-mark {
+    width: 36px;
+    height: 36px;
+    margin-right: 7px;
+    line-height: 36px;
+  }
+
+  .clicktv-legacy__card {
+    max-width: 680px;
+    max-height: calc(100vh - 20px);
+    padding: 18px 28px;
+    overflow-y: auto;
+    border-radius: 22px;
+  }
+
+  .clicktv-legacy__eyebrow {
+    margin-bottom: 6px;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .clicktv-legacy__code {
+    margin-bottom: 10px;
+    font-size: 64px;
+    letter-spacing: 4px;
+  }
+
+  .clicktv-legacy__title {
+    margin-bottom: 8px;
+    font-size: 32px;
+  }
+
+  .clicktv-legacy__message {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .clicktv-legacy__waiting {
+    margin-top: 10px;
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+
+  .clicktv-legacy__reset {
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+}
+
 @-webkit-keyframes clicktvLegacySpin {
   to {
     -webkit-transform: rotate(360deg);

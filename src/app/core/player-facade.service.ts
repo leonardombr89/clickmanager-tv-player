@@ -215,7 +215,7 @@ export class PlayerFacadeService implements OnDestroy {
   private heartbeatPayload(): HeartbeatPayload {
     const current = this.configuration();
     return {
-      versaoPlayer: '0.1.0',
+      versaoPlayer: '1.0.2',
       versaoConfiguracao: current?.tela.versaoConfiguracao,
       playlistId: current?.playlist?.id,
       playlistVersao: current?.playlist?.versao,

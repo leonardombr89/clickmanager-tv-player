@@ -55,6 +55,10 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Configure unique Google Play version code
+        if: github.event_name != 'pull_request'
+        run: echo "CLICKTV_VERSION_CODE=$((100000 + GITHUB_RUN_NUMBER * 10 + GITHUB_RUN_ATTEMPT))" >> "$GITHUB_ENV"
+
       - name: Test Android player
         run: ./gradlew testDevelopmentDebugUnitTest
 
@@ -88,7 +92,7 @@ jobs:
           CLICKTV_KEYSTORE_BASE64: ${{ secrets.CLICKTV_ANDROID_KEYSTORE_BASE64 }}
         run: echo "$CLICKTV_KEYSTORE_BASE64" | base64 --decode > clicktv-release.jks
 
-      - name: Build signed production APK
+      - name: Build signed production APK and App Bundle
         if: github.event_name != 'pull_request'
         env:
           CLICKTV_KEYSTORE_PATH: ${{ github.workspace }}/android/clicktv-release.jks
@@ -96,21 +100,36 @@ jobs:
           CLICKTV_KEY_ALIAS: ${{ secrets.CLICKTV_ANDROID_KEY_ALIAS }}
           CLICKTV_KEY_PASSWORD: ${{ secrets.CLICKTV_ANDROID_KEY_PASSWORD }}
         run: |
-          ./gradlew assembleProductionRelease
-          mkdir -p build-apk
+          ./gradlew assembleProductionRelease bundleProductionRelease
+          mkdir -p build-apk build-aab
           cp app/build/outputs/apk/production/release/app-production-release.apk \
             build-apk/clicktv-player.apk
+          cp app/build/outputs/bundle/productionRelease/app-production-release.aab \
+            build-aab/clicktv-player.aab
 
       - name: Verify signed production APK
         if: github.event_name != 'pull_request'
         run: |
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build-apk/clicktv-player.apk
 
+      - name: Verify signed production App Bundle
+        if: github.event_name != 'pull_request'
+        run: jarsigner -verify build-aab/clicktv-player.aab
+
       - name: Publish APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: clicktv-production-apk
           path: android/build-apk/clicktv-player.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish Play Store App Bundle artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clicktv-production-aab
+          path: android/build-aab/clicktv-player.aab
           if-no-files-found: error
           retention-days: 30
 
@@ -165,3 +184,30 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:latest
             ghcr.io/${{ github.repository_owner }}/clickmanager-tv-player:${{ github.sha }}
+
+  publish-internal-test:
+    if: github.event_name != 'pull_request'
+    needs:
+      - android
+      - web-and-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Play Store App Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: clicktv-production-aab
+          path: android/build-aab
+
+      - name: Publish ClickTV to internal testing
+        uses: r0adkll/upload-google-play@v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.clickmanager.tvplayer
+          releaseFiles: android/build-aab/clicktv-player.aab
+          tracks: internal
+          status: completed
+          whatsNewDirectory: play-store/whatsnew
