@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4338CA"/>
+      <stop offset="1" stop-color="#312E81"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#background)"/>
+  <circle cx="1120" cy="80" r="310" fill="#fff" opacity=".05"/>
+  <circle cx="80" cy="690" r="260" fill="#fff" opacity=".05"/>
+  <rect x="150" y="204" width="312" height="312" rx="80" fill="#fff"/>
+  <text x="306" y="430" fill="#4338CA" font-family="Arial, Helvetica, sans-serif" font-size="206" font-weight="700" text-anchor="middle">C</text>
+  <text x="548" y="424" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="150" font-weight="700">ClickTV</text>
+  <text x="555" y="490" fill="#C7D2FE" font-family="Arial, Helvetica, sans-serif" font-size="38">Comunicação digital em todas as telas</text>
+</svg>
